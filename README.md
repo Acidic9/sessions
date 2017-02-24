@@ -25,11 +25,11 @@ func main() {
 	})
 
 	m.Get("/get", func(session sessions.Session) string {
-		v := session.Get("hello")
-		if v == nil {
-			return ""
+		v, valid := session.Get("hello").String()
+		if !valid {
+			return "Not a String"
 		}
-		return v.(string)
+		return v
 	})
 
   m.Run()
