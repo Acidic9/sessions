@@ -20,11 +20,12 @@
 package sessions
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/go-martini/martini"
 	"github.com/gorilla/context"
 	"github.com/gorilla/sessions"
-	"log"
-	"net/http"
 )
 
 const (
@@ -34,6 +35,16 @@ const (
 // Store is an interface for custom session stores.
 type Store interface {
 	sessions.Store
+}
+
+// Data stores a value in a session.
+//
+// The second return value for Int64(), Float64(), String() and Bool()
+// indicates weather the value was retrieved successfully and was valid.
+// If the session value's type is not valid for the function
+// (Int64 is used when the interface's type is bool), then false is returned.
+type Data struct {
+	Value interface{}
 }
 
 // Options stores configuration for a session or session store.
@@ -53,7 +64,7 @@ type Options struct {
 // Session stores the values and optional configuration for a session.
 type Session interface {
 	// Get returns the session value associated to the given key.
-	Get(key interface{}) interface{}
+	Get(key interface{}) *Data
 	// Set sets the session value associated to the given key.
 	Set(key interface{}, val interface{})
 	// Delete removes the session value associated to the given key.
@@ -105,8 +116,8 @@ type session struct {
 	written bool
 }
 
-func (s *session) Get(key interface{}) interface{} {
-	return s.Session().Values[key]
+func (s *session) Get(key interface{}) *Data {
+	return &Data{s.Session().Values[key]}
 }
 
 func (s *session) Set(key interface{}, val interface{}) {
@@ -163,4 +174,92 @@ func check(err error, l *log.Logger) {
 	if err != nil {
 		l.Printf(errorFormat, err)
 	}
+}
+
+// Int64 attempts to return an int64 from the session value.
+func (d *Data) Int64() (int64, bool) {
+	v := d.Value
+	switch v.(type) {
+	case int:
+		return int64(v.(int)), true
+	case int8:
+		return int64(v.(int8)), true
+	case int16:
+		return int64(v.(int16)), true
+	case int32:
+		return int64(v.(int32)), true
+	case int64:
+		return v.(int64), true
+
+	case uint:
+		return int64(v.(uint)), true
+	case uint8:
+		return int64(v.(uint8)), true
+	case uint16:
+		return int64(v.(uint16)), true
+	case uint32:
+		return int64(v.(uint32)), true
+	case uint64:
+		return int64(v.(uint64)), true
+
+	case float32:
+		return int64(v.(float32)), true
+	case float64:
+		return int64(v.(float64)), true
+	}
+	return 0, false
+}
+
+// Float64 attempts to return a float64 from the session value.
+func (d *Data) Float64() (float64, bool) {
+	v := d.Value
+	switch v.(type) {
+	case float32:
+		return float64(v.(float32)), true
+	case float64:
+		return v.(float64), true
+
+	case int:
+		return float64(v.(int)), true
+	case int8:
+		return float64(v.(int8)), true
+	case int16:
+		return float64(v.(int16)), true
+	case int32:
+		return float64(v.(int32)), true
+	case int64:
+		return float64(v.(int64)), true
+
+	case uint:
+		return float64(v.(uint)), true
+	case uint8:
+		return float64(v.(uint8)), true
+	case uint16:
+		return float64(v.(uint16)), true
+	case uint32:
+		return float64(v.(uint32)), true
+	case uint64:
+		return float64(v.(uint64)), true
+	}
+	return 0, false
+}
+
+// String attempts to return a string from the session value.
+func (d *Data) String() (string, bool) {
+	v := d.Value
+	switch v.(type) {
+	case string:
+		return v.(string), true
+	}
+	return "", false
+}
+
+// Bool attempts to return a bool from the session value.
+func (d *Data) Bool() (bool, bool) {
+	v := d.Value
+	switch v.(type) {
+	case bool:
+		return v.(bool), true
+	}
+	return false, false
 }
