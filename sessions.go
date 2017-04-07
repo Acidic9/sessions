@@ -177,7 +177,7 @@ func check(err error, l *log.Logger) {
 }
 
 // Int64 attempts to return an int64 from the session value.
-func (d *Data) Int64() (int64, bool) {
+func (d *Data) Int64() (i int64, valid bool) {
 	v := d.Value
 	switch v.(type) {
 	case int:
@@ -207,11 +207,11 @@ func (d *Data) Int64() (int64, bool) {
 	case float64:
 		return int64(v.(float64)), true
 	}
-	return 0, false
+	return i, false
 }
 
 // Float64 attempts to return a float64 from the session value.
-func (d *Data) Float64() (float64, bool) {
+func (d *Data) Float64() (f float64, valid bool) {
 	v := d.Value
 	switch v.(type) {
 	case float32:
@@ -241,25 +241,25 @@ func (d *Data) Float64() (float64, bool) {
 	case uint64:
 		return float64(v.(uint64)), true
 	}
-	return 0, false
+	return f, false
 }
 
 // String attempts to return a string from the session value.
-func (d *Data) String() (string, bool) {
+func (d *Data) String() (s string, valid bool) {
 	v := d.Value
 	switch v.(type) {
 	case string:
 		return v.(string), true
 	}
-	return "", false
+	return s, false
 }
 
 // Bool attempts to return a bool from the session value.
-func (d *Data) Bool() (bool, bool) {
+func (d *Data) Bool() (b bool, valid bool) {
 	v := d.Value
 	switch v.(type) {
 	case bool:
 		return v.(bool), true
 	}
-	return false, false
+	return b, false
 }
