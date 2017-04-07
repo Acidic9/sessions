@@ -32,7 +32,7 @@ func main() {
 		return v
 	})
 
-  m.Run()
+	m.Run()
 }
 
 ~~~
