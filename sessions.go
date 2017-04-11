@@ -78,7 +78,7 @@ type Session interface {
 	// Flashes returns a slice of flash messages from the session.
 	// A single variadic argument is accepted, and it is optional: it defines the flash key.
 	// If not defined "_flash" is used by default.
-	Flashes(vars ...string) []interface{}
+	Flashes(vars ...string) []*Data
 	// Options sets confuguration for a session.
 	Options(Options)
 }
@@ -141,9 +141,15 @@ func (s *session) AddFlash(value interface{}, vars ...string) {
 	s.written = true
 }
 
-func (s *session) Flashes(vars ...string) []interface{} {
+func (s *session) Flashes(vars ...string) (d []*Data) {
 	s.written = true
-	return s.Session().Flashes(vars...)
+
+	flashes := s.Session().Flashes(vars...)
+	for _, f := range flashes {
+		d = append(d, &Data{f})
+	}
+
+	return d
 }
 
 func (s *session) Options(options Options) {
