@@ -182,6 +182,11 @@ func check(err error, l *log.Logger) {
 	}
 }
 
+// IsSet returns a bool indicating weather the value already exists.
+func (d *Data) IsSet() bool {
+	return d.Value != nil
+}
+
 // Int64 attempts to return an int64 from the session value.
 func (d *Data) Int64() (i int64, valid bool) {
 	v := d.Value
